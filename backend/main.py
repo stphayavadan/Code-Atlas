@@ -14,11 +14,15 @@ used only for the clone subprocess and is never persisted or echoed back.
 from __future__ import annotations
 
 import os
+from pathlib import Path
 from typing import Dict, List, Optional
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
+load_dotenv(dotenv_path=Path(__file__).resolve().parent / ".env")
 
 from build_job import JOB
 from llm.qa_agent import answer_question

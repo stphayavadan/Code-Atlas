@@ -67,6 +67,14 @@ cd backend
 pip install -r requirements.txt
 REPO_PATH='C:\path\to\any\python\repo' python -m uvicorn main:app --host 127.0.0.1 --port 8077
 # or: ./run-backend.sh
+
+### Backend environment
+
+Copy `backend/.env.example` to `backend/.env` and set the Azure Key Vault variables there:
+- `KV_CLIENT_ID`
+- `KV_CLIENT_SECRET`
+- `KV_TENANT_ID`
+- `KV_URL`
 ```
 
 **Frontend** (Vite dev server on 5173, proxies /api → 8077):
