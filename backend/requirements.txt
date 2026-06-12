@@ -1,0 +1,9 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+networkx==3.5
+numpy>=1.26          # required by networkx spring_layout (map clustering)
+scipy>=1.11          # speeds up / stabilizes spring_layout for larger graphs
+boto3==1.43.18
+azure-identity==1.25.2
+azure-keyvault-secrets==4.10.0
