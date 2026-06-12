@@ -13,7 +13,7 @@
 - **Renders** it as a dark, cinematic **WebGL map** (Sigma.js) with **semantic
   zoom**: pull back to see packages as glowing continents; zoom in to reveal
   files, then classes, then individual functions — Google-Maps style.
-- **Narrates** with Azure Foundry: an opening establishing shot of the whole repo, plus
+- **Narrates** with Azure Foundry IQ: an opening establishing shot of the whole repo, plus
   a plain-language explanation for every place on the map, spoken aloud (TTS).
 - **Guides** you on an AI-designed **tour** in a sensible learning order
   (entry point → core abstractions → supporting cast), the camera gliding from
@@ -44,11 +44,11 @@ and cached. Azure Foundry is used only for *narrative* — explaining, ordering,
 and navigating — never for parsing. Each request carries only the relevant
 slice of the graph, so it stays fast and on-topic.
 
-### Azure Foundry access
+### Azure Foundry IQ access
 
 Credentials are loaded from `backend/.env` or the environment. The backend uses
-`azure-ai-openai` to call Foundry chat models via `AZURE_FOUNDRY_ENDPOINT` and
-`AZURE_FOUNDRY_KEY`.
+`azure-ai-openai` to call Azure Foundry IQ chat models via
+`AZURE_FOUNDRY_ENDPOINT` and `AZURE_FOUNDRY_KEY`.
 
 | Role  | Model                                  | Used for                          |
 |-------|----------------------------------------|-----------------------------------|
