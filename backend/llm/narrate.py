@@ -1,4 +1,4 @@
-"""Narration: Claude turns graph nodes into plain-language explanations.
+"""Narration: Azure Foundry turns graph nodes into plain-language explanations.
 
 Two surfaces:
   - narrate_node(node, context)  : one rich explanation for a single place on
@@ -17,7 +17,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from .client import call_claude, extract_text, MODEL_FAST
+from .client import call_model, extract_text, MODEL_FAST
 
 NODE_SYSTEM = """You are the narrator of an interactive, cinematic "guided tour" \
 of a software codebase — think a museum audio guide, but for code. You are \
@@ -102,7 +102,7 @@ def narrate_node(node: dict, doc: dict, model: str = MODEL_FAST) -> str:
     neigh = _neighbour_summary(node["id"], doc)
     context = _node_context_block(node, neigh, repo_name)
 
-    resp = call_claude(
+    resp = call_model(
         system=NODE_SYSTEM,
         messages=[{
             "role": "user",
@@ -144,7 +144,7 @@ def narrate_overview(doc: dict, model: str = MODEL_FAST) -> str:
         f"Regions (packages) and their modules:\n" + "\n".join(region_lines)
     )
 
-    resp = call_claude(
+    resp = call_model(
         system=OVERVIEW_SYSTEM,
         messages=[{"role": "user", "content": f"Open the tour.\n\n{context}"}],
         model=model,

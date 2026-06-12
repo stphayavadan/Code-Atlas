@@ -4,7 +4,5 @@ pydantic==2.9.2
 networkx==3.5
 numpy>=1.26          # required by networkx spring_layout (map clustering)
 scipy>=1.11          # speeds up / stabilizes spring_layout for larger graphs
-boto3==1.43.18
-azure-identity==1.25.2
-azure-keyvault-secrets==4.10.0
+azure-ai-openai==1.3.0
 python-dotenv==1.0.0

@@ -6,9 +6,9 @@ Flow:
      the overview plus an explanation for EVERY node (in parallel).
   3. Frontend polls /api/build/status until ready (showing progress).
   4. The dive then serves graph/tour/overview/narration entirely from memory —
-     no mid-dive Claude calls, so motion never stalls.
+     no mid-dive model calls, so motion never stalls.
 
-All Claude/Bedrock credentials and the repo PAT live server-side. The PAT is
+All Azure Foundry credentials and the repo PAT live server-side. The PAT is
 used only for the clone subprocess and is never persisted or echoed back.
 """
 from __future__ import annotations

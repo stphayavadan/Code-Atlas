@@ -2,7 +2,7 @@
 
 The whole point: do ALL the slow work UP FRONT (clone -> parse -> design tour ->
 narrate the overview AND every node) so the dive itself never stalls waiting on
-Claude. Per-node narration is generated in parallel (thread pool) and stored in
+Azure Foundry. Per-node narration is generated in parallel (thread pool) and stored in
 memory; the frontend polls progress and only enters the dive once everything is
 ready.
 
@@ -21,7 +21,7 @@ from repo_clone import clone_repo, CloneResult
 from llm.narrate import narrate_node, narrate_overview
 from llm.tour import design_tour
 
-# How many narration calls to run concurrently against Bedrock.
+# How many narration calls to run concurrently against Foundry.
 NARRATION_CONCURRENCY = 6
 
 
