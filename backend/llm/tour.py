@@ -1,9 +1,9 @@
-"""Tour sequencing: Claude designs the teaching order for the map.
+"""Tour sequencing: Azure Foundry designs the teaching order for the map.
 
-Given the repo's structure (not its full source), Claude chooses an ordered
+Given the repo's structure (not its full source), the model chooses an ordered
 list of stops — entry point first, then core abstractions, then supporting
 cast — and a one-line reason for each stop. This is the "guided tour" spine;
-the per-stop narration is filled in lazily by narrate.py as the camera arrives.
+per-stop narration is filled in lazily by narrate.py as the camera arrives.
 
 We use the SMART model here because ordering requires reasoning about the whole
 system at once, but the payload is tiny (just the node catalog), so it is cheap.
@@ -13,46 +13,15 @@ from __future__ import annotations
 import json
 from typing import Any, Dict, List
 
-from .client import call_claude, MODEL_SMART
-
-TOUR_TOOL = {
-    "name": "propose_tour",
-    "description": "Propose the ordered sequence of stops for a guided code tour.",
-    "input_schema": {
-        "type": "object",
-        "properties": {
-            "title": {
-                "type": "string",
-                "description": "A short, inviting title for this tour (max 8 words).",
-            },
-            "stops": {
-                "type": "array",
-                "description": "Ordered tour stops, 6 to 12 of them. Start at the entry "
-                               "point, move to core abstractions, then supporting modules. "
-                               "Each id MUST be one of the provided node ids.",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "nodeId": {"type": "string", "description": "Exact node id to visit."},
-                        "reason": {"type": "string",
-                                   "description": "One short sentence: why this stop, why now."},
-                    },
-                    "required": ["nodeId", "reason"],
-                },
-            },
-        },
-        "required": ["title", "stops"],
-    },
-}
+from .client import call_model, extract_text, MODEL_SMART
 
 TOUR_SYSTEM = """You are an expert software educator designing a guided tour of a \
 codebase for a newcomer. You are given a catalog of the codebase's modules, \
 classes and key functions, plus how they connect. Design the best LEARNING \
 ORDER: begin at the natural entry point, reveal the core abstractions the system \
 is built on, then the supporting pieces. Prefer modules and important classes/\
-functions as stops; skip trivial helpers. Choose 6 to 12 stops. Call the \
-propose_tour tool with your plan. Every nodeId must be exactly one from the \
-catalog."""
+functions as stops; skip trivial helpers. Choose 6 to 12 stops. Return only a \
+valid JSON object with keys: title (string) and stops (array of {nodeId, reason})."""
 
 
 def _build_catalog(doc: dict) -> str:
@@ -96,26 +65,24 @@ def design_tour(doc: dict, model: str = MODEL_SMART) -> Dict[str, Any]:
         f"Codebase: {repo.get('name')} (Python, {repo.get('fileCount')} files, "
         f"{repo.get('totalLines')} lines).\n\n"
         f"Node catalog (use these exact ids):\n{catalog}\n\n"
-        f"Design the guided tour now via the propose_tour tool."
+        f"Design the guided tour now. Return ONLY a valid JSON object with keys: "
+        f"title and stops. Stops must be an array of {{nodeId, reason}} entries."
     )
 
-    resp = call_claude(
+    resp = call_model(
         system=TOUR_SYSTEM,
         messages=[{"role": "user", "content": user}],
         model=model,
         max_tokens=1500,
-        tools=[TOUR_TOOL],
-        tool_choice={"type": "tool", "name": "propose_tour"},
+        temperature=0.3,
     )
 
-    from .client import extract_tool_use
-    block = extract_tool_use(resp, "propose_tour")
-    if not block:
-        # Fallback: entry points + highest-fanIn nodes.
+    text = extract_text(resp)
+    try:
+        plan = json.loads(text)
+    except Exception:
         return _fallback_tour(doc)
 
-    plan = block.get("input", {})
-    # Validate + drop any hallucinated ids, preserving order.
     clean_stops = []
     seen = set()
     for stop in plan.get("stops", []):
@@ -126,7 +93,7 @@ def design_tour(doc: dict, model: str = MODEL_SMART) -> Dict[str, Any]:
     if not clean_stops:
         return _fallback_tour(doc)
 
-    return {"title": plan.get("title", f"A tour of {repo.get('name')}"),
+    return {"title": plan.get("title", f"A tour of {repo.get('name')}") ,
             "stops": clean_stops}
 
 
